@@ -20,3 +20,19 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
+  kafka:
+    admin:
+      security:
+        protocol:
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 683654054004-gsofq4ovjs32f7ehunqllnskto306njl.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+            - email
+            - profile
+

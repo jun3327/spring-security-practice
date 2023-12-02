@@ -47,13 +47,16 @@ public class SecurityConfig{
 //                                        response.getWriter().write("{\"message\":\"로그인필요\",\"error\":true}");
 //                                    })
 //                        );
-//
 //                        //권한 없는 사용자가 요청했을 경우, 로그인 페이지로 가도록 설정(SSR)
                         .formLogin(formLogin -> formLogin
                                 .loginPage("/loginForm")
                                 .loginProcessingUrl("/login") // /login 주소가 호출되면 시큐리티가 낚아채서 대신 로그인을 진행
                                 .defaultSuccessUrl("/") // 로그인 성공시 url 리다이렉션
-                        );
+                        )
+                        //oauth2 로그인
+                        .oauth2Login(oauth2Login -> oauth2Login
+                                .loginPage("/loginForm")); //구글 로그인 완료 이후 후처리가 필요함.
+
 
 
         return http.build();
