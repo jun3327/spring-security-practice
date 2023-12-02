@@ -27,7 +27,7 @@ public class SecurityConfig{
         http.authorizeHttpRequests(authorize ->
                 authorize
                         //url에 따라 인가된 사용자만 접근가능하게 설정
-                        .requestMatchers("/user/**").authenticated()
+                        .requestMatchers("/user/**").authenticated() //인증만 되면 접근 가능
                         .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN")
 
@@ -48,6 +48,8 @@ public class SecurityConfig{
 //                        //권한 없는 사용자가 요청했을 경우, 로그인 페이지로 가도록 설정(SSR)
                         .formLogin(formLogin -> formLogin
                                 .loginPage("/loginForm")
+                                .loginProcessingUrl("/login") // /login 주소가 호출되면 시큐리티가 낚아채서 대신 로그인을 진행
+                                .defaultSuccessUrl("/") // 로그인 성공시 url 리다이렉션
                         );
 
 
