@@ -3,6 +3,8 @@ package com.cos.security1.controller;
 import com.cos.security1.domain.User;
 import com.cos.security1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,5 +58,18 @@ public class IndexController {
         user.setPassword(encPassword);
         userRepository.save(user);
         return "redirect:/loginForm";
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/info")
+    public @ResponseBody String info() {
+        return "개인정보";
+    }
+
+    //권한 여러개 걸고 싶으면, 아래와 같이 @PreAuthorize 사용
+    @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+    @GetMapping("/data")
+    public @ResponseBody String data() {
+        return "데이터 정보";
     }
 }
