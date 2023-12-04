@@ -20,4 +20,6 @@ public class User {
     private String password;
     private String email;
     private String role; //ROLE_USER, ROLE_ADMIN
+    private String provider; // ex) google,
+    private String providerId; //google의 sub 값
 }

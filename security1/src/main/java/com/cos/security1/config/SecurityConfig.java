@@ -1,6 +1,8 @@
 package com.cos.security1.config;
 
+import com.cos.security1.config.oauth.PrincipalOauth2UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -9,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -16,6 +19,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity //스프링 시큐리티 필터가 스프링 필터체인에 등록된다.
 @EnableMethodSecurity(securedEnabled = true) // 메소드 수준에서 보안 권한 가능 (@Secured), @PreAuthorize /@PostAuthorize 기본 사용가능.
 public class SecurityConfig{
+
+    @Autowired
+    private PrincipalOauth2UserService principalOauth2UserService;
 
     @Bean
     public BCryptPasswordEncoder encodePwd() {
@@ -55,9 +61,9 @@ public class SecurityConfig{
                         )
                         //oauth2 로그인
                         .oauth2Login(oauth2Login -> oauth2Login
-                                .loginPage("/loginForm")); //구글 로그인 완료 이후 후처리가 필요함.
-
-
+                                .loginPage("/loginForm")
+                                //로그인 후 후처리, 액세스 토큰 발급과 사용자프로필 받기는 oauth2 client 라이브러리가 알아서 해준다.
+                                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(principalOauth2UserService)));
 
         return http.build();
     }
