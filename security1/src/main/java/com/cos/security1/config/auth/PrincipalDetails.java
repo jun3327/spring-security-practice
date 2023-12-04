@@ -10,13 +10,20 @@ package com.cos.security1.config.auth;
 // 근데 Authentication 안에 User 정보는 UserDetails(PrincipalDetails) 타입이어야 된다.
 
 import com.cos.security1.domain.User;
+import lombok.Data;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
-public class PrincipalDetails implements UserDetails {
+//UserDetails, OAuth2User를 모두 상속하여 구현한 PrincipalDetails 객체를 Authentication 객체 안에 들어가도록 구현한다.
+//위 주석과 관련해서 중요한점.txt에 메모해 두었다.
+@Data
+public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private User user;
 
@@ -69,5 +76,20 @@ public class PrincipalDetails implements UserDetails {
         // 그 접속 안한 시간을 넘어가면 아래 return을 false로 하는 식으로 동작할 수 있음.
 
         return true;
+    }
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public <A> A getAttribute(String name) {
+        return OAuth2User.super.getAttribute(name);
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
     }
 }
