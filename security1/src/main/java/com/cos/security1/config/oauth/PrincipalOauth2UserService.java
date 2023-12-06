@@ -2,6 +2,9 @@ package com.cos.security1.config.oauth;
 
 
 import com.cos.security1.config.auth.PrincipalDetails;
+import com.cos.security1.config.oauth.provider.FacebookUserInfo;
+import com.cos.security1.config.oauth.provider.GoogleUserInfo;
+import com.cos.security1.config.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.domain.User;
 import com.cos.security1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
@@ -40,19 +45,30 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         //oAuth2User1 = {sub=1067785750038111111, name=김땡떙, given_name=땡떙, family_name=김, picture=https://lh3.googleusercontent.com/a/ACg8ocJaSiBWIht4_Suutf3WERhvsaDEIHD, email=ssss@gmail.com, email_verified=true, locale=ko}
         System.out.println("userRequest getAccessToken = " + oAuth2User.getAttributes());
 
+        //OAuth2 서비스 제공자에 따른 분기
+        OAuth2UserInfo oAuth2UserInfo = null;
+        switch (userRequest.getClientRegistration().getRegistrationId()) {
+            case "google":
+                oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+                break;
+            case "facebook":
+                oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
+                break;
+            default:
+                throw new IllegalArgumentException("구글하고 페이스북만 지원해요");
+        }
 
+        //oAuth2UserInfo를 이용한 나머지 로직 수행
         //회원 가입 강제 진행
-        String provider = userRequest.getClientRegistration().getClientId(); // google
-        String providerId = oAuth2User.getAttributes().get("sub").toString(); //ex) 1067785750038111111
+        String provider = oAuth2UserInfo.getProvider(); // ex)google
+        String providerId = oAuth2UserInfo.getProviderId(); //ex) 1067785750038111111
         String username = provider + "_" + providerId; //provider와 providerId를 조합(중복 불가)
         String password = bCryptPasswordEncoder.encode("겟인데어"); //password는 Oauth라 크게 의미 없다.
-        String email = oAuth2User.getAttributes().get("email").toString(); // ex) ssss@gmail.com
+        String email = oAuth2UserInfo.getEmail(); // ex) ssss@gmail.com
         String role = "ROLE_USER";
 
         User userEntity = userRepository.findByUsername(username);
-
         if (userEntity == null) {
-
             userEntity = User.builder()
                     .username(username)
                     .password(password)
@@ -63,6 +79,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
                     .build();
             userRepository.save(userEntity);
         }
+
 
         //아래 PrincipalDetails 객체가 Authenticaion 객체 안으로 들어가고 시큐리티 세션에 저장된다.
         //지금은 Oauth2 과정이기 때문에, PrncipalDetails 안에 User 정보와 Oauth2User의 attributes 정보가 들어간다.
