@@ -4,6 +4,7 @@ package com.cos.security1.config.oauth;
 import com.cos.security1.config.auth.PrincipalDetails;
 import com.cos.security1.config.oauth.provider.FacebookUserInfo;
 import com.cos.security1.config.oauth.provider.GoogleUserInfo;
+import com.cos.security1.config.oauth.provider.NaverUserInfo;
 import com.cos.security1.config.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.domain.User;
 import com.cos.security1.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -54,8 +56,11 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
             case "facebook":
                 oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
                 break;
+            case "naver":
+                oAuth2UserInfo = new NaverUserInfo((Map)oAuth2User.getAttributes().get("response"));
+                break;
             default:
-                throw new IllegalArgumentException("구글하고 페이스북만 지원해요");
+                throw new IllegalArgumentException("구글하고 페이스북 네이버만 지원해요");
         }
 
         //oAuth2UserInfo를 이용한 나머지 로직 수행
