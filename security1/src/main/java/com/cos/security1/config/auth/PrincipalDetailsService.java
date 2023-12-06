@@ -20,6 +20,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     // 'username' 형식을 잘 지켜야 된다.
     // return 되는 PrincipalDetails(userEntity)는 Authentication 안에 들어간다.
     // 그리고 Authentication은 시큐리티 session에 들어감. -> 로그인 끝
+    // 메소드 종료 시 컨트롤러의 @AuthenticationPrincipal이 만들어짐.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User userEntity = userRepository.findByUsername(username);

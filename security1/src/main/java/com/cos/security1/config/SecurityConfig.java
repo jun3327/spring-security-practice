@@ -23,10 +23,12 @@ public class SecurityConfig{
     @Autowired
     private PrincipalOauth2UserService principalOauth2UserService;
 
-    @Bean
-    public BCryptPasswordEncoder encodePwd() {
-        return new BCryptPasswordEncoder();
-    }
+
+    //PrincipalOauth2UserService와 SecurityConfig의 순환 참조 예방하기 위해 아래 주석처리 후 CustomBCr~ 클래스 생성.
+//    @Bean
+//    public BCryptPasswordEncoder encodePwd() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

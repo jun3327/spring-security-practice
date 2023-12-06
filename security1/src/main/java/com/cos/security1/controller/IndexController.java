@@ -52,8 +52,11 @@ public class IndexController {
         return "index";
     }
 
+    // PrincipalDetails가 UserDetails와 Oauth2User을 모두 구현하기 때문에,
+    // 일반 로그인을 하던, Oauth2 로그인을 하던, 모두 PrincipalDetails로 받을 수 있다.
     @GetMapping("/user")
-    public @ResponseBody String user() {
+    public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        System.out.println("principalDetails = " + principalDetails.getUser());
         return "user";
     }
 
