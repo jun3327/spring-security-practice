@@ -24,7 +24,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         //스프링 시큐리티 filter chain이 내가 만든 필터보다 먼저 실행되므로, MyFilter3이 시큐리티 필터 체인보다
-        //먼저 실행되게 하고 싶으면 아래와 같이 만든다. 
+        //먼저 실행되게 하고 싶으면 아래와 같이 만든다.
         http.addFilterBefore(new MyFilter3(), SecurityContextPersistenceFilter.class);
         http.csrf(AbstractHttpConfigurer::disable);
         //세션 만들지 않기.
