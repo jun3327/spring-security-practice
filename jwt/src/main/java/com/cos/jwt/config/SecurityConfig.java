@@ -6,10 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.filter.CorsFilter;
@@ -20,11 +23,16 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private final CorsFilter corsFilter;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+        //AuthenticaionManager 생성
+        AuthenticationManagerBuilder sharedObject = http.getSharedObject(AuthenticationManagerBuilder.class);
+        sharedObject.userDetailsService(this.userDetailsService); //이 userDetailsService와 PrincipalDetailsService에서 상속받는 인터페이스는 서로 같음.
+        AuthenticationManager authenticationManager = sharedObject.build();
+        http.authenticationManager(authenticationManager);
 
         //스프링 시큐리티 filter chain이 내가 만든 필터보다 먼저 실행되므로, MyFilter3이 시큐리티 필터 체인보다
         //먼저 실행되게 하고 싶으면 아래와 같이 만든다.
