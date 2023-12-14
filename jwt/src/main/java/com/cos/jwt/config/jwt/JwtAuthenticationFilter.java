@@ -1,5 +1,7 @@
 package com.cos.jwt.config.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.cos.jwt.auth.PrincipalDetails;
 import com.cos.jwt.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 // /login을 통해 username과 password를 post로 전송하면 UsernamePasswordAuthenticationFilter가 실행된다
 // 근데 지금은 config에서 formlogin을 disable 했기 때문에 실행이 안되고, PrincipalDetailsService을 위해 여기서
@@ -55,6 +58,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // 아래 메소드에서 JWT 토큰 생성 후 사용자에게 response 해준다.
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        super.successfulAuthentication(request, response, chain, authResult);
+        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
+
+        //HMAC512 방식 암호화
+        String jwtToken = JWT.create()
+                        .withSubject("jwt토큰")
+                        .withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10))) //10분
+                        .withClaim("id", principalDetails.getUser().getId())
+                        .withClaim("username",principalDetails.getUser().getUsername())
+                        .sign(Algorithm.HMAC512("secretKeyByServer"));
+        response.addHeader("Authorization", "Bearer " + jwtToken);
     }
 }
